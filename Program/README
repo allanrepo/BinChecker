@@ -1,0 +1,49 @@
+Greetings:
+
+    The latest version exists at the following path in the Unison
+release tree:
+
+    /ltx/customer/unit_test/AUT/BinChecker/BinChecker.una
+    /ltx/customer/unit_test/AUT/BinChecker/README
+
+    The program support 256 sites, for software/hardware bins MIN_BIN and MAX_BIN.
+In this case, the definitions are as follows:
+
+		MIN_BIN = 0
+		MAX_BIN = 256
+
+	All ExtInterface Objects exist in the program for each EIM that exists in
+the Unison CURI software.
+
+    The program has TestOptions which can be used to your advantage
+in debugging/proving interface operation.
+
+    MaxHardwareBin = This is the maximum number of bins the EIM supports.
+                     If your EIM supports bins 0-7, then enter 8 for this
+                     value. If the EIM supports bins 0-31, then enter 32
+	             for this value.
+
+    RandomBinning = This boolean options allows random bin generation to each
+                    of the sites when TRUE.  When FALSE, the bin sent to
+                    each site is determined by SitenConstBin TestOptions where
+                    n = 1 through 16.
+
+    SitenConstBin = The bin sent to Site n when RandomBinning is FALSE. The
+	            values are limited between MIN_BIN and MAX_BIN.
+
+
+    You can turn the Datalog ON and see that the bin sent to a given site matches
+the actual value calculated.  Both BinTool, Datalog, and handler should correlate
+for each site.
+
+    Load the program, then Set the Active EIM to your choice.  You can then save the
+program, release and re-load, or just proceed from there.  This program will allow
+you to verify all forms of EIM interfacing in Unison and the handlers supported
+through CURI.
+
+    This program should work even for Single Site EIM drivers.
+
+Good Luck,
+
+LTX-Credence Applications
+

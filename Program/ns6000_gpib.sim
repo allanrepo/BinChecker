@@ -1,0 +1,49 @@
+# NS60xx GPIB simulation file for phemu
+# Typical usage: phemu -l -o CRLF -r <this file> gpib1
+# EOI usage    : phemu -l -o EOI,CRLF -r <this file> gpib1
+# curi usage ./phemu -lc -o CRLF,port:10 -r ns6000_gpib.sim gpib0
+
+# syntax:  "<mtch_str>", "<resp_str>", "<actn_str>", fixed_num, rand_rate, state, next_state, delay\n
+
+# IEEE-488.2 Mandatory common commands and queries:
+"\*IDN\?",	    "NS6000"    # Identification query
+"\*RST",	    "@NOP"      # Reset
+"\*TST\?",	    "1"         # Self-test query
+"\*OPC\?",	    "1"  	    # Opearation complete query
+"\*OPC*",	    "@NOP"  	# Operation complete
+"\*WAI",	    "@NOP"  	# Wait to complete
+"\*CLS",	    "@NOP" 	    # Clear status
+"\*ESE\?",	    "0" 	    # Event status enable query
+"\*ESE*",	    "@NOP" 	    # Event status enable
+"\*ESR\?",	    "0" 	    # Event status register query
+"\*SRE\?",	    "1" 	    # Service request enable query
+"\*SRE*",	    "@NOP" 	    # Service request enable
+"\*STB\?",	    "0" 	    # Read status byte query
+# Standard commands and queries
+"\*PSC*", 		"@NOP"      # Save SRQ mask
+"\*SAV*", 		"@NOP"      # Save config in flash
+
+# Pseudo entries called locally
+"@STARTUP",		"@SRQ:0x41", "startlot; startwafer; timeout 29.9", , , , 1
+"@TIMEOUT",		"Timeout occurred", "print; goto _TIMEOUT"
+"_TIMEOUT",		"@SRQ:0x48", "goto @STARTUP"
+
+# Device-specific commands & queries
+#"FULLSITES\?",	"FULLSITES 00000003"
+"FULLSITES\?",	"FULLSITES 0000A5A5", "", , 10.0
+"FULLSITES\?",	"FULLSITES 00001003", "", , 10.0
+"FULLSITES\?",	"FULLSITES 00000E00", "", , 10.0
+"FULLSITES\?",	"FULLSITES 0000000F", "", , 10.0
+"FULLSITES\?",	"FULLSITES 0000BCC7", "", , 10.0
+"FULLSITES\?",	"FULLSITES 0000FFFF"
+#"BINON:*",		"@ECHO:ECHO:00000000,00000000,00000000,????????;", "", , 5.0 # occasional bad echo
+#"BINON:*",		"@ECHO:ECHO:%r"  # broken!!! %r strips first 0
+"BINON:*",		"@ECHO:ECHO:0%r" # broken!!! %r strips first 0
+#"BINON:*",		"@ECHO:ECHO:00000000,00000000,00000000,00000011;"
+"ECHOOK",		"@SRQ:0x41","INDEX",0,0,0,0,0.4
+"ECHONG",		"Error: BINON echo bad", "print", , , , ,1.5
+"SDC",			"@NOP"
+
+# NS7000
+"FR?",			"FR1" 	# 0=stop/ 1=run
+"SRQ MASK*",	"@NOP"	# Service request mask

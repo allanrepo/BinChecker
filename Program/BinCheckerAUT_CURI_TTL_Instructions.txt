@@ -1,0 +1,5 @@
+BinChecker CURI TTL TESTING INSTRUCTIONS:
+
+Follow the instructions found in the following location using a browser.
+
+http://ca-wiki.ltx.com/twiki/pub/SQA/WebSQAWorkInstructionsTables/UnisonTTLInterfaceandCURIDriverTesting.htm

@@ -1,0 +1,56 @@
+Unison: U3.1.3 or above
+MIN CURI: v113 or above
+PHEMU: phemu CPU with GPIB card and cable connected between the phemu CPU and the tester CPU GPIB card
+
+CPU Setup:
+  1. Tester CPU: 
+       Needs GPIB card
+       Install latest CURI to be tested
+
+  2. Phemu CPU:
+      Needs GPIB card
+      Needs to be able to set_os to Unison build to run phemu program
+
+  3. Connect GPIB cable between the Tester CPU and the Phemu CPU (can piggyback onto other GPIB connections)
+
+
+CURI GPIB Test / BinChecker AUT:
+
+1. On Phemu CPU:
+  -- set_os <unison build under test>
+  -- On the PHEMU box, type in the following commands: 
+       # cd $TRILLIUM_DIR/unit_test/AUT/BinChecker/Program
+       # /ltx/apps_support/ph_emulator/phemu -c -l -o CRLF,port:10 -r ns600_gpib.sim gpib0
+      NOTE: THIS STEP MUST TAKE PLACE BEFORE CLICKING APPLY IN THE "NEW LOT" DIALOG.
+  -- phemu activity output comes to the display console.
+
+2. On the tester, load up the desired Unison build
+  -- cd /opt/ateTools/curi
+  -- The unison link needs to point to the correct CURI version (e.g CURI_1.11_2.100) for testing Unison
+  -- cd to test program: $TRILLIUM_DIR/unit_test/AUT/BinChecker/Program
+  -- Start launcher, use Production mode, the LTXC-Operator Control UI starts
+  -- Click "Load" , select the BinChecker.una file.
+  -- Click "New Lot"
+  -- Type in "1"s in each available field.
+  -- Probe Handler ID, select "EPSON_NS_SERIES"
+  -- Click Apply in the "New Lot" dialog
+  -- Click Start.
+  -- Both the LTXC-Operator Control UI (tester BOX) and the console on the PHEMU box show activity
+  -- You can ignore error messages in the PHEMU box consule. As long as the test is running, we are fine.
+  -- Click Pause, the test should pause - both boxes should show a "haulted" status.
+  -- Click Resume, the tests contineus - both boxes should show active "test running" status.
+  -- Click Stop, the test stops, all LTXC-Operator Control UI status boxes go white, the console on the PHEMU box stops.
+  -- Click New Lot, 
+  -- Change the Lot ID from 1 to 2, click Apply
+  -- Click Start, again the test activity should be active on both boxes.
+  -- Click Stop, the test activity should stop.
+  -- Play around with various combination of the above.  Look at the Site and SW/HW Bin dialogs. Change the Random Binning Operator Variable to "False" etc.
+
+3. On LTXC-Operator Control UI, click File->Exit (you must be at the New Lot state to do this).
+4. On PHEMU box, click Ctrl-C to stop the console (it can take a couple of minutes to actually stop)
+
+Conclusion:  
+No logs need to be saved, just verify that all test actions result in expected UI/console activity
+
+
+

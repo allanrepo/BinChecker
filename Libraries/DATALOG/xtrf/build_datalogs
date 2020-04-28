@@ -1,0 +1,78 @@
+#!/bin/sh
+
+force=""
+
+# Nothing to modify below this line
+usage () {
+	echo "Usage: $0 [options] LTX_UPROD_PATH value"
+	echo "Valid options are:"
+	echo "   -f	   	Force datalog rebuild"
+}
+
+while getopts "f" option; do
+  case "$option" in
+    f)  force="-force" ;;
+    h)  # it's always useful to provide some help 
+        usage
+        exit 0 
+        ;;
+    :)  echo "Error: -$OPTARG requires an argument" 
+        usage
+        exit 1
+        ;;
+    ?)  echo "Error: unknown option -$OPTARG" 
+        usage
+        exit 1
+        ;;
+  esac
+done 
+shift $((OPTIND-1))   
+
+# Check there is 1 parameter
+#if (( $# != 1 )); then
+#	printf 'Error: Missing path to LTX_UPROD_PATH\n'
+#	usage
+#	exit -1
+#fi
+if (( $# == 1 )); then
+	export LTX_UPROD_PATH=$1/..
+else
+	export LTX_UPROD_PATH=$PWD/..
+fi
+
+UNISON_PATH=/opt/ltx/releases
+
+KERNEL_VERSION=`uname -r | cut -d- -f1`
+KERNEL_ARCH=`uname -p`
+KERNEL_NAME=`uname -s | tr A-Z a-z`
+# My arch code...
+ARCH="$KERNEL_ARCH"_"$KERNEL_NAME"_"$KERNEL_VERSION"
+#echo "LTX_UPROD_PATH: "${LTX_UPROD_PATH}
+#echo "Target Arch   : "$ARCH
+
+failcount=0
+
+printf 'Building custom datalogs to '$LTX_UPROD_PATH'\n'
+# Unison releases path
+for releaseFolder in `ls $UNISON_PATH | grep -P "^U\d{4}"` ; do
+	if [ -f $UNISON_PATH/$releaseFolder/$ARCH/bin/MethodCompiler ]; then
+		printf '  Building STM custom datalogger ('$releaseFolder')... '
+		export LTX_PATH=$UNISON_PATH/$releaseFolder/$ARCH
+		export CUSTOMER_DIR=$UNISON_PATH/$releaseFolder/$ARCH
+		export TARGET_NAME=$releaseFolder
+		mkdir -p $LTX_UPROD_PATH/DATALOG/$TARGET_NAME/
+		$UNISON_PATH/$releaseFolder/$ARCH/bin/MethodCompiler $force -f Compile.uno > $LTX_UPROD_PATH/DATALOG/$TARGET_NAME/MethodCompiler.log 2>&1
+		if [ $? == 0 ]; then
+			printf  '\n'
+		else
+			printf '!!! FAILED !!! See '$LTX_UPROD_PATH'/DATALOG/'$TARGET_NAME'/MethodCompiler.log for details.\n'
+			failcount=$(expr $failcount + 1)
+		fi
+	else
+		printf '  Skipping '$releaseFolder' build. Could not find '$ARCH'/bin/MethodCompiler\n'
+	fi
+done
+export LTX_PATH
+export CUSTOMER_DIR
+export TARGET_NAME
+exit $failcount
